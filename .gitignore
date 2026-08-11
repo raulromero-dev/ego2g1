@@ -1,0 +1,54 @@
+# --- data: everything heavy stays out of git (see docs/data-schema.md) ---
+data/**
+!data/**/.gitkeep
+!data/**/README.md
+
+# vendored upstream repos (clone via scripts/bootstrap_third_party.sh)
+third_party/*
+!third_party/.gitkeep
+
+# body models / robot assets with restrictive licenses — never commit
+assets/smplx/**
+assets/smpl/**
+*.npz
+*.pkl
+*.ckpt
+*.pt
+*.pth
+*.safetensors
+*.onnx
+
+# media
+*.mp4
+*.mov
+*.MOV
+*.r3d
+*.usdz
+*.hdf5
+*.h5
+*.zarr/
+
+# training junk
+runs/
+outputs/
+wandb/
+logs/
+.rerun/
+*.rrd
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+*.egg-info/
+.ipynb_checkpoints/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# macos / editors
+.DS_Store
+.vscode/
+.idea/
