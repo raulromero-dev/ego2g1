@@ -52,3 +52,6 @@ venv/
 .DS_Store
 .vscode/
 .idea/
+
+# raw egocentric captures (large; keep out of git)
+egocentric-data/
