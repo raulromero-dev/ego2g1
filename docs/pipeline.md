@@ -108,8 +108,12 @@ corpus samples the body motion most consistent with how your head moved.
   all generative samples from a prior, not measurements. Do not make claims about them.
 - Its prior is **staged mocap**, which under-represents exactly your target: crouching to pick
   something up, carrying a box, opening a door mid-stride.
-- It expects **Project Aria** data. Feeding it an iPhone recording takes ~200–400 lines of glue:
-  a loader producing head poses in its expected frame, and a floor-height estimate.
+- It expects **Project Aria** data, and this is worse than it sounds. EgoAllo is bound to Aria's
+  VRS + closed-loop trajectories + semidense points, outputs SMPL-**H** rather than SMPL-X, and
+  its "run on raw video" issue has been open and unanswered for a year. Budget a loader rewrite,
+  a floor-plane estimator, a lever-arm calibration, a coordinate conversion, and a body-model
+  hop — against a model that has never seen a ~70° rectilinear camera. See
+  [plan.md](plan.md#2-the-one-piece-of-code-that-doesnt-exist-is-the-piece-everything-depends-on).
 
 Hands come from **HaMeR** run on the frames. Its finger articulation is excellent; its world
 placement is poor. So take **wrist position from EgoAllo, finger articulation from HaMeR.**
