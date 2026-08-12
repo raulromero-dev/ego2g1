@@ -19,7 +19,12 @@ echo "==> system packages"
 sudo apt-get update -qq
 # git-lfs is not actually needed (neither GVHMR nor GMR uses LFS, and HF downloads over HTTP),
 # but it costs ten seconds and removes a whole class of "why are my weights 133 bytes" confusion.
-sudo apt-get install -y -qq build-essential git git-lfs python3.10-venv python3.10-dev ffmpeg unzip
+# python3.10-tk is needed only because hmr4d/utils/body_model/body_model.py opens with a stray
+# `from turtle import forward` -- an IDE autocomplete artifact that survived into the repo. turtle
+# imports tkinter, which no headless server ships. Installing the package beats patching upstream,
+# since a re-clone would silently lose the patch.
+sudo apt-get install -y -qq build-essential git git-lfs python3.10-venv python3.10-dev \
+                            python3.10-tk ffmpeg unzip
 
 echo "==> python venv (3.10 — required by the pytorch3d wheel)"
 python3.10 -m venv "$VENV"
@@ -31,6 +36,15 @@ echo "==> cython + numpy BEFORE requirements"
 # cython_bbox compiles at install time and needs numpy already importable; installing it as a
 # transitive dep of requirements.txt fails because the build env cannot see numpy yet.
 pip install -q cython "numpy==1.23.5"
+
+echo "==> chumpy (needs --no-build-isolation)"
+# chumpy's setup.py does `import pip`, which pip's isolated build env does not provide, so the
+# default path dies with ModuleNotFoundError: No module named 'pip'. Disabling isolation lets it
+# see the venv's own pip. It is pulled in by smplx for the SMPL .pkl body models.
+pip install -q --no-build-isolation chumpy || {
+  echo "    chumpy still failing; retrying with setuptools<70 (it uses removed APIs)"
+  pip install -q "setuptools<70" && pip install -q --no-build-isolation chumpy
+}
 
 echo "==> clone GVHMR @ ${GVHMR_SHA}"
 if [ ! -d "$REPO/.git" ]; then
@@ -49,10 +63,18 @@ echo "==> checkpoints from the ungated HuggingFace mirror"
 # The upstream README points at Google Drive, which is painful headless. camenduru/GVHMR carries
 # the same files ungated, so no HF token is needed.
 mkdir -p inputs/checkpoints outputs
-pip install -q -U "huggingface_hub[cli]"
-hf download camenduru/GVHMR \
-    --include 'gvhmr/*' 'hmr2/*' 'vitpose/*' 'yolo/*' \
-    --local-dir inputs/checkpoints
+pip install -q -U huggingface_hub
+# Fetch each file explicitly. `--include` with glob patterns is silently ignored by current
+# huggingface_hub ("Ignoring --include since filenames have been explicitly set"), and the file
+# it skipped was gvhmr_siga24_release.ckpt -- i.e. GVHMR itself, leaving the three supporting
+# models in place and looking like a successful download.
+for f in gvhmr/gvhmr_siga24_release.ckpt \
+         hmr2/epoch=10-step=25000.ckpt \
+         vitpose/vitpose-h-multi-coco.pth \
+         yolo/yolov8x.pt; do
+  echo "    $f"
+  hf download camenduru/GVHMR "$f" --local-dir inputs/checkpoints >/dev/null
+done
 
 # DPVO is deliberately absent. It is the only component needing the CUDA *toolkit* rather than
 # just the driver, it wants Eigen 3.4 + torch-scatter + numba + pypose, and `-s` (static camera)
