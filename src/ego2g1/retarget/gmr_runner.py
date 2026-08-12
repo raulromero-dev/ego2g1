@@ -26,6 +26,8 @@ from scipy.spatial.transform import Rotation
 
 from ego2g1 import conventions as C
 
+WARMUP_ITERS = 8
+
 G1_XML = Path("third_party/GMR/assets/unitree_g1/g1_mocap_29dof.xml")
 
 
@@ -128,6 +130,13 @@ def retarget(motion: SmplxMotion, body_model=None, *, subject_height_m: float,
               f"(scale {world_scale:.4f})")
 
     retargeter = GMR(actual_human_height=subject_height_m, src_human="smplx", tgt_robot=robot)
+
+    # GMR's IK is stateful: each solve warm-starts from the previous one. The very first frame
+    # therefore starts from the robot's default pose and only partially converges, which showed
+    # up as a 4-5 m root teleport between frames 0 and 1 (156 m/s) while every later frame moved
+    # a normal ~3 cm. Solve the first frame repeatedly until the solution settles, then record.
+    for _ in range(WARMUP_ITERS):
+        retargeter.retarget(frames[0])
 
     qpos = np.zeros((len(frames), C.G1_NQ), dtype=np.float64)
     for t, frame in enumerate(frames):

@@ -55,3 +55,6 @@ venv/
 
 # raw egocentric captures (large; keep out of git)
 egocentric-data/
+
+# downloaded general corpus (147 min of LAFAN1 retargeted to G1)
+data/35_reference/general/
