@@ -30,6 +30,17 @@ EGO_CRF = 26
 TARGET_FPS = 30
 
 
+def _is_readable(path: Path) -> bool:
+    """True only if the container is complete and decodable."""
+    if path.stat().st_size < 1024:
+        return False
+    result = subprocess.run(
+        ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+         "-of", "default=nw=1:nk=1", str(path)],
+        capture_output=True, text=True)
+    return result.returncode == 0 and bool(result.stdout.strip())
+
+
 @dataclass(frozen=True)
 class CutSpec:
     clip_id: str
@@ -44,7 +55,12 @@ def cut_clip(spec: CutSpec, *, expect_hw: tuple[int, int] | None = None,
              overwrite: bool = False) -> Path:
     """Cut and re-encode one clip, then verify the rotation actually landed."""
     if spec.dst.exists() and not overwrite:
-        return spec.dst
+        # Existence is not validity. An interrupted encode leaves a file with no moov atom,
+        # which every subsequent run would skip and every reader would reject -- silently, until
+        # something far downstream fails. Re-cut anything that will not open.
+        if _is_readable(spec.dst):
+            return spec.dst
+        spec.dst.unlink()
     spec.dst.parent.mkdir(parents=True, exist_ok=True)
 
     # -ss before -i seeks fast; ffmpeg re-encodes from the nearest keyframe and trims
