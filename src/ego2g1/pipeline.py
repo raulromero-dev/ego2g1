@@ -65,6 +65,76 @@ def foot_skate(joints_pos_m: np.ndarray, fps: float,
     return float(np.median(vel[contact])) if contact.any() else 0.0
 
 
+#: A pelvis sits at roughly 0.55 x stature; 1.75 m -> ~0.96 m. Reconstructions that put it well
+#: outside this band are not describing a person standing on the floor.
+PELVIS_RATIO = 0.55
+
+
+def frame_quality(schema: dict, subject_height_m: float, *,
+                  pelvis_tol_m: float = 0.12, skate_tol: float = 0.25,
+                  smooth_s: float = 0.5) -> np.ndarray:
+    """Per-frame boolean: is the reconstruction plausible here?
+
+    Two independent signals, both cheap:
+
+    - **pelvis height** near ``0.55 * stature``. Depth ambiguity shows up first as the body
+      floating or sinking, and this catches it directly rather than via a proxy.
+    - **instantaneous toe speed while in contact**, which catches sliding even when the height
+      happens to look right.
+
+    Smoothed before thresholding so single-frame dropouts do not shred an otherwise good span
+    into unusable fragments.
+    """
+    fps = float(schema["fps"])
+    pelvis = schema["root_pos_m"][:, 2]
+    expected = PELVIS_RATIO * subject_height_m
+    ok_height = np.abs(pelvis - expected) < pelvis_tol_m
+
+    toes = schema["joints_pos_m"][:, list(TOE_JOINTS), :]
+    vel = np.linalg.norm(np.diff(toes[:, :, :2], axis=0), axis=2) * fps
+    contact = toes[:-1, :, 2] < 0.04
+    slide = np.zeros(len(pelvis), dtype=bool)
+    per_frame = np.where(contact, vel, 0.0).max(axis=1)
+    slide[:-1] = per_frame > skate_tol
+    ok_skate = ~slide
+
+    ok = ok_height & ok_skate
+    k = max(1, int(round(smooth_s * fps)))
+    if k > 1:  # majority filter
+        pad = np.pad(ok.astype(float), (k // 2, k // 2), mode="edge")
+        ok = np.convolve(pad, np.ones(k) / k, mode="valid")[: len(ok)] > 0.5
+    return ok
+
+
+def good_spans(ok: np.ndarray, fps: float, *, min_duration_s: float = 2.0
+               ) -> list[tuple[int, int]]:
+    """Contiguous runs of usable frames, as [start, end) index pairs.
+
+    ``min_duration_s`` is 2 s because a gait cycle is ~1 s; anything shorter cannot support a
+    cadence or stride measurement and is not worth carrying downstream.
+    """
+    if not ok.any():
+        return []
+    edges = np.diff(np.concatenate([[0], ok.astype(int), [0]]))
+    starts, ends = np.where(edges == 1)[0], np.where(edges == -1)[0]
+    min_len = int(round(min_duration_s * fps))
+    return [(int(a), int(b)) for a, b in zip(starts, ends) if b - a >= min_len]
+
+
+def slice_schema(schema: dict, a: int, b: int, *, suffix: str) -> dict:
+    """Cut a motion schema down to [a, b), preserving provenance."""
+    out = {}
+    n = int(schema["n_frames"])
+    for k, v in schema.items():
+        arr = np.asarray(v)
+        out[k] = arr[a:b] if (arr.ndim >= 1 and arr.shape[0] == n) else v
+    out["n_frames"] = np.int32(b - a)
+    out["clip_id"] = f"{schema['clip_id']}{suffix}"
+    out["trimmed_from"] = str(schema["clip_id"])
+    out["trim_range"] = np.array([a, b], dtype=np.int32)
+    return out
+
+
 def run_clip(entry: ClipEntry, subject_height_m: float, *,
              render: bool = False, overwrite: bool = False) -> ClipResult:
     from ego2g1.pose import gvhmr_import as gi
