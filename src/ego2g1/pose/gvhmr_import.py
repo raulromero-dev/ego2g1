@@ -47,6 +47,26 @@ class ImportReport:
     warnings: list[str]
 
 
+def _rolling_floor(foot_z: np.ndarray, *, fps: float, window_s: float = 2.0,
+                   quantile: float = 0.10) -> np.ndarray:
+    """Time-varying floor estimate: a low quantile of foot height over a sliding window.
+
+    The window must be long enough to contain at least one full ground contact (a stride is
+    ~1 s at normal cadence, so 2 s is safe) and short enough to follow real drift. The result is
+    smoothed so the correction never introduces its own step discontinuities.
+    """
+    n = len(foot_z)
+    half = max(1, int(round(window_s * fps / 2)))
+    floor = np.empty(n, dtype=np.float64)
+    for i in range(n):
+        lo, hi = max(0, i - half), min(n, i + half + 1)
+        floor[i] = np.quantile(foot_z[lo:hi], quantile)
+    # Smooth with a box filter of the same width, edge-padded to avoid end artefacts.
+    k = min(n, 2 * half + 1)
+    pad = np.pad(floor, (k // 2, k // 2), mode="edge")
+    return np.convolve(pad, np.ones(k) / k, mode="valid")[:n]
+
+
 def _median_betas(betas: np.ndarray) -> np.ndarray:
     """GVHMR emits per-frame betas; shape should not drift within a clip."""
     return np.median(np.asarray(betas, dtype=np.float64), axis=0).astype(np.float32)
@@ -116,12 +136,23 @@ def convert(results: dict, *, clip_id: str, subject_height_m: float,
     joints *= world_scale
     verts *= world_scale
 
-    # Ground the motion: the 5th percentile of the lowest foot height is a robust floor estimate,
-    # tolerant of a few frames where a foot is mis-placed.
+    # Ground the motion. A single constant offset is not enough: monocular depth is weakest along
+    # the optical axis, and the subject walks along it, so GVHMR trades distance against height
+    # and the whole body drifts upward as they recede. Measured on this footage, the lowest foot
+    # sat at ~0.03 m at the 5th percentile while the *median* foot height climbed as high as
+    # 0.89 m within a single clip, putting the pelvis at 1.72 m for a 1.75 m person.
+    #
+    # The real floor is flat, so any time-varying lower envelope of foot height IS drift.
+    # Estimate it with a rolling low quantile and subtract per frame.
     foot_z = joints[:, list(FOOT_JOINTS), 2].min(axis=1)
-    floor_z = float(np.percentile(foot_z, 5))
-    transl[:, 2] -= floor_z
-    joints[:, :, 2] -= floor_z
+    floor_track = _rolling_floor(foot_z, fps=fps)
+    floor_z = float(np.percentile(foot_z, 5))          # reported for provenance
+    drift = float(floor_track.max() - floor_track.min())
+    if drift > 0.10:
+        warnings.append(f"floor drifted {drift:.2f} m within the clip — removed per-frame; "
+                        "global translation along the camera axis is unreliable here")
+    transl[:, 2] -= floor_track
+    joints[:, :, 2] -= floor_track[:, None]
 
     root_pos = transl.astype(np.float32)
     root_quat = C.make_quat_continuous(

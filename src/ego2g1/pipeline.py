@@ -40,18 +40,29 @@ class ClipResult:
     error: str = ""
 
 
-def foot_skate(joints_pos_m: np.ndarray, fps: float,
-               foot_idx=(7, 8, 10, 11), contact_h: float = 0.06) -> float:
-    """Mean horizontal foot speed while a foot is close to the ground.
+#: SMPL-X toe joints. Deliberately NOT the ankles (7, 8): measured on this footage, an ankle
+#: joint sits 4.6-10 cm above the floor even with the foot flat, so any contact threshold loose
+#: enough to include ankles also admits mid-swing frames.
+TOE_JOINTS = (10, 11)
 
-    A planted foot should not translate. This is the single most diagnostic number for whether a
+
+def foot_skate(joints_pos_m: np.ndarray, fps: float,
+               foot_idx=TOE_JOINTS, contact_h: float = 0.04) -> float:
+    """Median horizontal toe speed while in ground contact.
+
+    A planted foot should not translate. This is the most diagnostic single number for whether a
     reference motion is physically learnable — an RL tracker cannot reproduce a foot that slides
-    while in contact, and no amount of training fixes it.
+    while in contact, and no training budget fixes it.
+
+    **Median, not mean.** The contact set always leaks a few swing-phase frames as the foot
+    passes through the threshold, and those carry near-swing velocities. On a real clip here the
+    mean read 0.647 m/s against a median of 0.121 m/s over identical frames — the mean would have
+    condemned motion that is actually fine.
     """
     feet = joints_pos_m[:, list(foot_idx), :]
     vel = np.linalg.norm(np.diff(feet[:, :, :2], axis=0), axis=2) * fps
     contact = feet[:-1, :, 2] < contact_h
-    return float(vel[contact].mean()) if contact.any() else 0.0
+    return float(np.median(vel[contact])) if contact.any() else 0.0
 
 
 def run_clip(entry: ClipEntry, subject_height_m: float, *,
