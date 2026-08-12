@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ego2g1"
+version = "0.1.0"
+description = "Egocentric/exocentric video to Unitree G1 whole-body motion"
+requires-python = ">=3.12"
+dependencies = [
+  "numpy>=2.0",
+  "scipy>=1.13",
+  "pandas>=2.2",
+  "pyarrow>=16",
+  "opencv-python>=4.10",
+  "imageio[ffmpeg]>=2.34",
+  "av>=12",
+  "mujoco>=3.8",
+  "rerun-sdk>=0.26",
+  "pillow>=10",
+  "rich>=13",
+  "tqdm>=4.66",
+  "matplotlib>=3.9",
+  "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+# Retargeting stack. mink/qpsolvers are only needed once GMR runs.
+retarget = ["mink>=0.0.5", "qpsolvers[proxqp]>=4.3", "smplx>=0.1.28", "trimesh>=4.0"]
+# Semantic clip labelling.
+label = ["google-genai>=1.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
