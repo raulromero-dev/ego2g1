@@ -31,7 +31,7 @@ echo "==> patch csv_to_npz to stay local"
 # only used for `wandb.run.use_artifact()`, i.e. lineage tracking, not loading. Patching the
 # upload out avoids requiring an account and avoids creating one W&B run per motion file
 # (we have ~110 of them).
-python - <<'PY'
+python3 - <<'PY'
 from pathlib import Path
 p = Path.home() / "mjlab/src/mjlab/scripts/csv_to_npz.py"
 s = p.read_text()
