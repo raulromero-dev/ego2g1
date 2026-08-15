@@ -1,0 +1,624 @@
+/* my walk of life, editorial, monochrome, one accent pair.
+   Type: Archivo (grotesque) + Permanent Marker (annotation) + JetBrains Mono (data).
+   Palette validated for CVD in both modes:
+     light  mine #7E9338 (the green of the shirt)  them #2E6FB7
+     dark   mine #8AA03F                        them #4A8CD8 */
+
+:root {
+  --paper:#FFFFFF;  --ink:#000000;  --ink-2:#666666;  --ink-3:#8F8F8F;
+  --line:#EAEAEA;   --line-2:#D4D4D4;  --sunken:#FAFAFA;
+  --mine:#7E9338;   --them:#2E6FB7;
+  --serif:'Archivo',-apple-system,system-ui,sans-serif;
+  --marker:'Architects Daughter','Rock Salt',cursive;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --gut:clamp(20px,5vw,88px);
+  --max:1180px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#000000; --ink:#EDEDED; --ink-2:#A1A1A1; --ink-3:#7D7D7D;
+    --line:#1F1F1F; --line-2:#333333; --sunken:#0A0A0A;
+    --mine:#8AA03F; --them:#4A8CD8;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#000000; --ink:#EDEDED; --ink-2:#A1A1A1; --ink-3:#7D7D7D;
+  --line:#1F1F1F; --line-2:#333333; --sunken:#0A0A0A;
+  --mine:#8AA03F; --them:#4A8CD8;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--serif); font-size:17px; line-height:1.55;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  transition:background .15s ease,color .15s ease;
+}
+
+.mode{
+  position:fixed; top:20px; right:20px; z-index:50;
+  width:44px; height:44px; border-radius:12px;
+  border:1.5px solid var(--ink); background:var(--paper);
+  cursor:pointer; display:grid; place-items:center; padding:0;
+  transition:background .2s, border-color .2s, transform .15s;
+}
+.mode:hover{transform:translateY(-1px)}
+.mode:active{transform:translateY(0) scale(.96)}
+.mode:focus-visible{outline:2px solid var(--mine); outline-offset:3px}
+.mode .ic{
+  width:22px; height:22px; grid-area:1/1;
+  fill:none; stroke:var(--ink); stroke-width:1.9;
+  stroke-linecap:round; stroke-linejoin:round;
+  transition:opacity .25s, transform .35s cubic-bezier(.2,.8,.2,1);
+}
+/* light mode: outlined button, moon showing */
+.mode .sun{opacity:0; transform:rotate(-90deg) scale(.5)}
+.mode .moon{opacity:1; transform:none}
+/* dark mode: the button inverts, filled, sun showing */
+.mode.is-dark{background:var(--ink); border-color:var(--ink)}
+.mode.is-dark .ic{stroke:var(--paper)}
+.mode.is-dark .moon{opacity:0; transform:rotate(90deg) scale(.5)}
+.mode.is-dark .sun{opacity:1; transform:none}
+.mode:hover{border-color:var(--line-2); color:var(--ink); background:var(--sunken)}
+
+
+.rule{height:1px; background:var(--line); margin-bottom:26px}
+
+/* ── type scale ───────────────────────────────────────────────── */
+h1{
+  font-size:clamp(58px,13vw,190px); line-height:.86; font-weight:600;
+  letter-spacing:-.045em; margin:.06em 0 .5em; text-wrap:balance;
+}
+h1 em{font-style:italic; font-weight:400; color:var(--ink-2)}
+h2{
+  font-size:clamp(30px,5.2vw,62px); line-height:1.02; font-weight:600;
+  letter-spacing:-.032em; margin:0 0 .5em; max-width:16ch; text-wrap:balance;
+}
+.huge{font-size:clamp(35px,7.65vw,107px); line-height:.92; max-width:none}
+/* a heading written as two full sentences: one line each, so it stays two lines */
+.two-line{font-size:clamp(23px,3.3vw,41px); line-height:1.14; max-width:none;
+          letter-spacing:-.026em; text-wrap:normal}
+.huge em{font-style:italic; font-weight:600; color:var(--ink)}
+/* the sentence ends on a footprint rather than a full stop */
+.verdict .print{
+  width:.14em; height:.34em; display:inline-block; fill:var(--ink);
+  vertical-align:baseline; margin-left:.12em; transform:rotate(-7deg);
+}
+.kicker{
+  font-family:var(--mono); font-size:12px; letter-spacing:.1em;
+  color:var(--ink-3); margin:0 0 14px;
+}
+.lead{font-size:clamp(21px,2.7vw,31px); line-height:1.34; max-width:24ch;
+      font-weight:500; letter-spacing:-.018em; margin:0 0 56px; color:var(--ink)}
+.body{font-size:clamp(16px,1.5vw,19px); color:var(--ink-2); max-width:54ch; margin:0 0 40px}
+.body b{color:var(--ink); font-weight:600}
+.center{margin-left:auto; margin-right:auto; text-align:center}
+.mono{font-family:var(--mono); font-size:12.5px; color:var(--ink-3)}
+.fine{font-size:12.5px; color:var(--ink-3); max-width:60ch}
+
+blockquote{
+  font-size:clamp(24px,3.4vw,44px); line-height:1.22; font-weight:500;
+  letter-spacing:-.028em; margin:0; max-width:19ch; text-wrap:balance;
+}
+.dots{color:var(--ink-3); letter-spacing:.08em}
+
+.sharpie{
+  font-family:var(--marker); color:var(--ink);
+  font-size:clamp(15px,1.7vw,21px); line-height:1.25;
+  letter-spacing:.005em;
+  transform:rotate(-3deg); display:inline-block; pointer-events:none;
+  /* a marker bleeds slightly into the paper */
+  text-shadow:0 0 .35px currentColor;
+}
+
+/* ── layout ───────────────────────────────────────────────────── */
+.hero{
+  padding:clamp(70px,12vw,150px) var(--gut) clamp(50px,8vw,90px);
+  max-width:var(--max); margin:0 auto;
+}
+.hero blockquote{margin-top:clamp(26px,4vw,52px); max-width:22ch}
+
+/* the photo gets its own screen-space, and arrives in sequence */
+.portrait-moment{
+  padding:clamp(20px,4vw,60px) var(--gut) clamp(60px,10vw,130px);
+  max-width:var(--max); margin:0 auto;
+  display:flex; justify-content:flex-end;
+}
+.portrait-stage{width:min(58%,420px); position:relative}
+@media (max-width:860px){
+  .portrait-moment{justify-content:center}
+  .portrait-stage{width:min(88%,380px)}
+}
+/* 1. the photo settles in */
+.portrait-stage img{
+  opacity:0; transform:translateY(26px) scale(.97) rotate(-1.2deg);
+  transition:opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1);
+}
+.portrait-stage.in img{opacity:1; transform:none}
+/* 3. the label is written last */
+.portrait-stage .sharpie{
+  opacity:0; transform:translateY(6px) rotate(-6deg);
+  transition:opacity .5s ease 1.45s, transform .6s cubic-bezier(.2,.8,.2,1) 1.45s;
+}
+.portrait-stage.in .sharpie{opacity:1; transform:rotate(-3deg)}
+.band{padding:clamp(58px,9vw,140px) var(--gut); max-width:var(--max); margin:0 auto}
+/* it sits closer to the sections either side of it than a normal band does */
+.verdict{padding:clamp(44px,7.5vw,105px) var(--gut); text-align:center; max-width:var(--max); margin:0 auto}
+footer{padding:60px var(--gut) 80px; max-width:var(--max); margin:0 auto}
+footer p{margin:0 0 10px}
+
+.hero-grid{display:grid; grid-template-columns:1fr .68fr; gap:clamp(24px,5vw,72px); align-items:end}
+@media (max-width:860px){ .hero-grid{grid-template-columns:1fr} }
+
+.cards{display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(12px,2.2vw,26px)}
+@media (max-width:800px){ .cards{grid-template-columns:1fr 1fr} .cards figure:last-child{grid-column:span 2} }
+@media (max-width:520px){ .cards{grid-template-columns:1fr} .cards figure:last-child{grid-column:auto} }
+
+/* the rig stands alone on the right; the walking footage lives further down the page */
+.rig-solo{
+  width:min(46%,380px); margin-top:clamp(10px,2vw,24px);
+  margin-left:auto; margin-right:0;   /* it sits to the right of the heading */
+  --p:1; --q:.5;                      /* scroll progress, written by app.js */
+}
+@media (max-width:820px){ .rig-solo{width:min(78%,320px); margin-right:auto} }
+
+/* ── pinterest-ish figures ────────────────────────────────────── */
+figure{margin:0; position:relative}
+.pin img{
+  width:100%; aspect-ratio:2/3.15; object-fit:cover; display:block;
+  border-radius:25px; background:var(--sunken);
+}
+.pin.tall img{
+  /* the real photo is 607x548, fit the frame to it rather than crop either of them out */
+  aspect-ratio:607/548; object-fit:cover;
+  box-shadow:0 1px 2px rgba(0,0,0,.06), 0 12px 32px -14px rgba(0,0,0,.28);
+}
+figcaption{
+  font-family:var(--serif); font-size:10.5px; color:var(--ink-3);
+  margin-top:9px; letter-spacing:.005em; line-height:1.45;
+  display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+}
+figcaption b{color:var(--ink-2); font-weight:500}
+.tag-a,.tag-b{color:var(--ink)!important; font-weight:600}
+
+.vid video{width:100%; display:block; border-radius:25px; background:#000; aspect-ratio:2/3.15; object-fit:cover}
+.vid.wide video{aspect-ratio:16/9; object-fit:contain; border-radius:25px}
+/* the mesh/robot pair is 840x640; give it its own frame so nothing letterboxes */
+/* the claim beside the footage that backs it, rather than stacked under it */
+.pitch{
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:clamp(26px,4.5vw,64px); align-items:center;
+  margin-top:clamp(78px,11vw,150px);
+}
+@media (max-width:860px){ .pitch{grid-template-columns:1fr; gap:clamp(24px,5vw,40px)} }
+/* the statement is set like the comparison heading, not like body copy */
+.pitch h2{margin:0}
+.pitch .body{margin:0; font-size:clamp(17px,1.6vw,20px); max-width:40ch}
+.vid.pair{width:min(100%,660px); margin:0 auto}
+.pitch .vid.pair{width:100%}
+.vid.pair video{aspect-ratio:21/16; object-fit:cover; border-radius:25px}
+.pending-box{
+  aspect-ratio:16/9; border:1px dashed var(--line-2); border-radius:25px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px;
+  background:var(--sunken);
+}
+.pending-box p{margin:0; font-family:var(--mono); font-size:12.5px; color:var(--ink-3)}
+
+/* sharpie annotations */
+.note-a{position:absolute; top:-34px; left:2px}
+.note-b{position:absolute; top:-28px; right:10px}
+.note-c{position:absolute; right:14px; bottom:52px; z-index:3}
+
+/* hand-drawn arrow */
+.arrow{position:absolute; left:-132px; top:6px; width:152px; height:118px;
+       overflow:visible; pointer-events:none; display:none}
+@media (min-width:980px){ .arrow{display:block} }
+.arrow path{fill:none; stroke:var(--ink); stroke-width:2.6;
+            stroke-linecap:round; stroke-linejoin:round}
+.arrow-path{stroke-dasharray:230; stroke-dashoffset:230}
+.arrow-head{stroke-dasharray:70; stroke-dashoffset:70}
+.portrait-stage.in .arrow-path{animation:draw .95s .55s cubic-bezier(.4,.1,.3,1) forwards}
+.portrait-stage.in .arrow-head{animation:draw .35s 1.4s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+
+/* ── stat row ─────────────────────────────────────────────────── */
+.stats{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background-color:var(--line);
+       background:var(--line); border:1px solid var(--line); border-radius:18px;
+       overflow:hidden; margin:0 0 clamp(30px,5vw,60px)}
+@media (max-width:700px){ .stats{grid-template-columns:1fr} }
+.stat{background:var(--paper); padding:22px 20px 20px; position:relative}
+.stat dt{font-family:var(--mono); font-size:12px; letter-spacing:.06em;
+         color:var(--ink-3); margin:0 0 12px}
+.stat .num{font-size:clamp(34px,4.6vw,54px); font-weight:600; letter-spacing:-.04em;
+           line-height:1; font-variant-numeric:tabular-nums; color:var(--ink)}
+.stat .num small{font-size:.4em; font-weight:500; letter-spacing:0; color:var(--ink-3)}
+.stat .vs{font-family:var(--mono); font-size:12px; color:var(--ink-3); margin-top:10px}
+.stat .vs b{color:var(--ink-2); font-weight:500}
+
+/* ── charts ───────────────────────────────────────────────────── */
+.chart canvas, .overlay-fig canvas{width:100%; display:block}
+.chart canvas{aspect-ratio:16/8; background:transparent}
+.overlay-fig{position:relative}
+.overlay-fig img{width:100%; display:block; border-radius:25px}
+.overlay-fig canvas{position:absolute; inset:0; height:100%}
+/* the two comparison charts read as one statement, so they sit side by side */
+.duo-charts{
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:clamp(22px,3.4vw,52px); align-items:start;
+}
+@media (max-width:820px){ .duo-charts{grid-template-columns:1fr; gap:clamp(38px,8vw,60px)} }
+/* two lines of room either way, so the two figures end at the same baseline */
+.duo-charts figcaption{min-height:2.9em; align-content:flex-start}
+/* 2:1 keeps the episode grid's rows inside the box at every width it gets */
+.chart.units canvas{aspect-ratio:2/1}
+.cite{color:var(--ink-2); text-decoration:underline; text-underline-offset:2px;
+      text-decoration-thickness:1px}
+.cite:hover{color:var(--ink)}
+
+.key{display:inline-flex; align-items:center; gap:6px}
+.key i{width:8px; height:8px; border-radius:50%; display:inline-block}
+/* matched to the chart: a sole apiece, mine inked in, theirs outlined */
+.key .sole{width:9px; height:14px; display:block}
+.key .sole .k-mine{fill:var(--ink)}
+.key .sole .k-them{fill:none; stroke:var(--ink-3); stroke-width:2}
+
+/* ── motion ───────────────────────────────────────────────────── */
+.reveal{opacity:0; transform:translateY(22px);
+        transition:opacity .75s cubic-bezier(.2,.7,.2,1) var(--d,0ms),
+                   transform .75s cubic-bezier(.2,.7,.2,1) var(--d,0ms)}
+.reveal.in{opacity:1; transform:none}
+
+.scroll-cue{margin-top:clamp(40px,7vw,90px); height:46px; position:relative}
+.scroll-cue span{position:absolute; left:0; top:0; width:1px; height:46px; background:var(--line-2); overflow:hidden}
+.scroll-cue span::after{content:""; position:absolute; inset:0; background:var(--ink);
+                        transform:translateY(-100%); animation:cue 2.4s ease-in-out infinite}
+@keyframes cue{0%{transform:translateY(-100%)}50%{transform:translateY(0)}100%{transform:translateY(100%)}}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important; transition:none!important}
+  .reveal{opacity:1; transform:none}
+  .arrow path{stroke-dashoffset:0!important}
+}
+
+/* ── walking legs animation ───────────────────────────────────── */
+.legs{position:relative}
+.legs canvas{width:100%; aspect-ratio:16/9; display:block; border-radius:25px; background:var(--sunken)}
+.legs .who{position:absolute; top:16px; font-family:var(--mono); font-size:12px; letter-spacing:.05em}
+.legs .who.a{left:6%; color:var(--mine)} .legs .who.b{right:6%; color:var(--them)}
+.phase{font-family:var(--serif); font-size:10.5px; color:var(--ink-3); margin-top:9px}
+
+
+/* ── dark mode: keep bright media from lighting the whole page ─── */
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) img,
+  :root:not([data-theme="light"]) video{
+    filter:brightness(.82) contrast(1.04);
+    transition:filter .2s ease;
+  }
+  :root:not([data-theme="light"]) img:hover,
+  :root:not([data-theme="light"]) video:hover{filter:none}
+  :root:not([data-theme="light"]) .pin img,
+  :root:not([data-theme="light"]) .vid video,
+  :root:not([data-theme="light"]) .overlay-fig img{
+    border:1px solid var(--line);
+  }
+  :root:not([data-theme="light"]) .stat{background:var(--sunken)}
+}
+:root[data-theme="dark"] img,
+:root[data-theme="dark"] video{
+  filter:brightness(.82) contrast(1.04);
+  transition:filter .2s ease;
+}
+:root[data-theme="dark"] img:hover,
+:root[data-theme="dark"] video:hover{filter:none}
+:root[data-theme="dark"] .pin img,
+:root[data-theme="dark"] .vid video,
+:root[data-theme="dark"] .overlay-fig img{border:1px solid var(--line)}
+:root[data-theme="dark"] .stat{background:var(--sunken)}
+
+
+/* Colour is reserved for data. --mine / --them appear only inside charts and their
+   legend keys, where they encode which series is which; every other element on the
+   page is ink on paper. */
+
+
+/* ── the worn-shoe slot ───────────────────────────────────────── */
+.hunch{
+  display:grid; grid-template-columns:1fr .62fr;
+  gap:clamp(24px,5vw,70px); align-items:center;
+  margin-bottom:clamp(40px,7vw,84px);
+}
+@media (max-width:820px){ .hunch{grid-template-columns:1fr; gap:34px} }
+.hunch .lead{margin-bottom:0}
+
+/* the shoe, in profile, it comes up from below rather than just fading in */
+.shoe-solo{
+  width:min(42%,330px);
+  margin:clamp(46px,8vw,86px) auto 0;
+  /* the annotation runs out to the right, so leave the photo off centre */
+  margin-right:clamp(70px,14vw,200px);
+  /* it comes up from well below the fold of the section, not a polite 20px nudge */
+  opacity:0; transform:translateY(200px) scale(.86) rotate(-5deg);
+  transition:opacity .9s cubic-bezier(.2,.7,.2,1),
+             transform 1.4s cubic-bezier(.16,.9,.26,1);
+}
+.shoe-solo.in{opacity:1; transform:none}
+@media (max-width:820px){
+  .shoe-solo{width:min(62%,300px); margin-right:clamp(30px,8vw,70px)}
+}
+/* it drifts afterwards, the way a photo pinned to a board never sits quite still */
+.shoe-plate{position:relative; animation:drift 9s ease-in-out 1.6s infinite}
+/* seen from above; the crop keeps the whole footprint, collar included.
+   multiply drops the photo's white studio background onto the paper, so the
+   shoe sits on the page rather than in a box */
+.shoe-plate img{
+  aspect-ratio:4/5; object-fit:cover; object-position:center 50%;
+  border-radius:25px; mix-blend-mode:multiply;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) .shoe-plate img{mix-blend-mode:normal}
+}
+:root[data-theme="dark"] .shoe-plate img{mix-blend-mode:normal}
+@keyframes drift{
+  0%,100%{transform:translateY(0) rotate(-1.1deg)}
+  50%    {transform:translateY(-9px) rotate(.9deg)}
+}
+@media (prefers-reduced-motion:reduce){
+  .shoe-plate{animation:none}
+  .shoe-solo{opacity:1; transform:none}
+}
+
+/* ── the marker goes over the photograph, and off the edge of it ──
+   Nothing here is clipped to the frame: the writing starts on the shoe and
+   runs out past the border, the way you'd scrawl on a print with a sharpie. */
+.shoe-plate .sharpie{position:absolute; z-index:4}
+.scrawl-heel{
+  left:80%; top:-13%; width:13ch; line-height:1.15;
+  transform:rotate(3deg); transform-origin:left top;
+}
+/* the arrow crosses the photo and lands on the heel opening */
+.scrawl-arrow{
+  position:absolute; left:40%; top:6%; width:70%; height:70%;
+  overflow:visible; pointer-events:none; z-index:3;
+}
+.scrawl-arrow path{fill:none; stroke:var(--ink); stroke-width:3;
+                   stroke-linecap:round; stroke-linejoin:round}
+/* dashes sized to these two paths, not to the portrait arrow's */
+.scrawl-arrow .arrow-path{stroke-dasharray:160; stroke-dashoffset:160}
+.scrawl-arrow .arrow-head{stroke-dasharray:60;  stroke-dashoffset:60}
+.shoe-solo.in .arrow-path{animation:draw 1s .85s cubic-bezier(.4,.1,.3,1) forwards}
+.shoe-solo.in .arrow-head{animation:draw .3s 1.7s ease forwards}
+/* the writing arrives after the arrow that leads to it */
+.shoe-plate .sharpie{opacity:0; transition:opacity .45s ease}
+.shoe-solo.in .scrawl-heel{transition-delay:1.85s; opacity:1}
+@media (max-width:560px){
+  .scrawl-heel{left:58%; top:-8%; width:11ch}
+}
+
+
+/* The source is 1200x2133 (0.563), far too tall to sit well in the page. Crop to 4:5 and
+   bias the framing upward, since the phone clamped to the brim is what matters and the
+   lower half is just shirt. */
+.rig-solo img{
+  aspect-ratio:4/5;
+  object-position:center 24%;
+}
+
+/* ── the rig, scrubbed by the scrollbar ───────────────────────────
+   Nothing here runs on a timer: --p (entrance) and --q (parallax) are
+   written straight from scroll position, so the photo settles, the arrow
+   draws and the label is written at exactly the pace the reader scrolls. */
+.rig-solo{
+  /* drifts a touch slower than the page, only ever a few pixels */
+  transform:translateY(calc((.5 - var(--q)) * 34px));
+  will-change:transform;
+}
+.rig-solo img{
+  opacity:clamp(0, calc(var(--p) * 2.4), 1);
+  transform:translateY(calc((1 - var(--p)) * 40px))
+            rotate(calc((1 - var(--p)) * -2.2deg))
+            scale(calc(.955 + var(--p) * .045));
+  transform-origin:70% 50%;
+}
+/* the arrow is drawn on, stroke by stroke, between 35% and 78% of the entrance */
+.rig-solo .arrow{left:auto; right:calc(100% - 26px); top:2px}
+.rig-solo .arrow-path{stroke-dashoffset:calc(230 * (1 - clamp(0, (var(--p) - .35) / .3, 1)))}
+.rig-solo .arrow-head{stroke-dashoffset:calc(70  * (1 - clamp(0, (var(--p) - .65) / .13, 1)))}
+/* and the label is written last */
+.rig-solo .note-b{
+  opacity:clamp(0, (var(--p) - .74) / .16, 1);
+  transform:rotate(-3deg) translateY(calc((1 - clamp(0, (var(--p) - .74) / .16, 1)) * 7px));
+}
+@media (min-width:980px){
+  /* on a wide screen the note sits above the arrow's tail, out to the left */
+  .rig-solo .note-b{left:auto; right:calc(100% + 34px); top:-50px; white-space:nowrap}
+}
+@media (prefers-reduced-motion:reduce){
+  .rig-solo, .rig-solo img{transform:none}
+  .rig-solo img, .rig-solo .note-b{opacity:1}
+  .rig-solo .arrow-path, .rig-solo .arrow-head{stroke-dashoffset:0}
+}
+
+/* ── heels in, toes out ─────────────────────────────────────────── */
+.chrono{margin:0 0 var(--gap-l);}
+.chrono img{width:100%;height:auto;display:block;border:1px solid var(--line);
+  background:#fff;border-radius:2px;}
+
+/* the canvas is tall enough that the zoom has somewhere to happen */
+.prints-fig{position:relative;margin:0;}
+.prints-fig canvas{width:100%;height:340px;display:block;}
+.prints-note{position:absolute;top:-4px;right:6px;font-size:1rem;opacity:.55;
+  transform:rotate(-3deg);pointer-events:none;}
+@media (max-width:640px){
+  .prints-fig canvas{height:270px;}
+  .prints-note{display:none;}
+}
+
+/* the walking footprints: tall, so several footfalls are on screen at once */
+.walk-fig{margin:.4rem 0 var(--gap-l);position:relative;}
+.walk-fig canvas{width:100%;height:520px;display:block;}
+
+/* the comparison, with its numbers alongside */
+.split{display:grid;grid-template-columns:1.35fr 1fr;gap:var(--gap-l);align-items:center;
+  margin:0 0 var(--gap-l);}
+.split-fig{margin:0;}
+.split-fig img{width:100%;height:auto;display:block;background:#fff;
+  border:1px solid var(--line);border-radius:2px;}
+.split-text .body{margin:0 0 1.4rem;}
+.mini{display:flex;flex-direction:column;gap:.85rem;margin:0;
+  border-top:1px solid var(--line);padding-top:1.1rem;}
+.mini div{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;}
+.mini dt{font-size:.82rem;color:var(--ink-3);letter-spacing:.01em;}
+.mini dd{margin:0;font-family:"JetBrains Mono",monospace;font-weight:500;
+  font-size:1.42rem;color:var(--ink);white-space:nowrap;}
+.mini dd small{font-size:.62em;color:var(--ink-3);margin-left:.1em;}
+.mini dd span{font-family:Archivo,sans-serif;font-size:.62rem;color:var(--ink-3);
+  margin-left:.5rem;font-weight:400;}
+@media (max-width:820px){
+  .split{grid-template-columns:1fr;gap:var(--gap-m,1.6rem);}
+  .walk-fig canvas{height:300px;}
+}
+
+/* title left, the walk crossing the space to its right */
+.heels-top{display:grid;grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);
+  gap:var(--gap-l);align-items:start;}
+/* the walk travels bottom-right to top-left, so the headline sits where it arrives */
+.heels-top h2{margin:0;align-self:start;padding-top:.15em;}
+.walk-fig{margin:0;position:relative;}
+.walk-fig canvas{width:100%;height:480px;display:block;}
+.walk-cap{margin:.5rem 0 0;font-size:.78rem;color:var(--ink-3);line-height:1.5;}
+@media (max-width:820px){
+  .heels-top{grid-template-columns:1fr;align-items:start;}
+  .walk-fig canvas{height:340px;}
+}
+
+/* the verdict already carries a lot of air below it; this section follows on directly */
+.band.tight-top{padding-top:clamp(6px,1vw,18px);}
+
+/* form trace: two lanes of overlapping walks, full width */
+.trace{margin:0 0 1.6rem;}
+.trace img{width:100%;height:auto;display:block;background:#fff;
+  border:1px solid var(--line);border-radius:2px;}
+.trace-keys{display:flex;flex-wrap:wrap;align-items:center;gap:.35rem 1.1rem;
+  margin-top:.7rem;font-size:.78rem;color:var(--ink-3);}
+.tkey{display:inline-flex;align-items:center;gap:.45rem;color:var(--ink);font-weight:500;}
+.tkey i{width:13px;height:13px;border-radius:3px;display:inline-block;}
+.sw-mine{background:#111111;}
+.sw-them{background:#8A8A8A;}
+.tkey-note{color:var(--ink-3);}
+
+/* the read-out sits under the trace: a short line, then the three numbers */
+.trace-read{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:var(--gap-l);align-items:start;margin:0 0 var(--gap-l);}
+.trace-read .body{margin:0;}
+@media (max-width:820px){ .trace-read{grid-template-columns:1fr;gap:1.4rem;} }
+
+/* the recovered body, drawn live from its vertices */
+/* me walking beside what my feet are doing, one row instead of two blocks */
+.walk-and-feet{
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:clamp(26px,4vw,56px); align-items:start;
+  margin:0 0 clamp(34px,5vw,60px);
+}
+@media (max-width:860px){ .walk-and-feet{grid-template-columns:1fr; gap:clamp(20px,4vw,34px)} }
+/* the statement heads both halves, so it clears the row rather than a column */
+.walk-and-feet + *{margin-top:0}
+.band .lead{max-width:34ch}
+.mesh-fig{margin:0;}
+.mesh-fig canvas{width:100%;height:460px;display:block;}
+@media (max-width:860px){ .mesh-fig canvas{height:320px;} }
+
+/* the two foot positions, drawn to scale */
+.foot-fig{margin:0;}
+
+/* the foot diagram wants the full column: its callouts sit outside the feet */
+.body.lead{max-width:44ch;margin:0 0 1.8rem;}
+.foot-fig canvas{width:100%;height:460px;display:block;}
+.foot-fig figcaption{margin-top:.6rem;}
+
+/* swing time: three lanes ticking at their measured rates */
+.swing-fig{margin:0 0 var(--gap-l);}
+.swing-fig canvas{width:100%;height:300px;display:block;}
+@media (max-width:820px){ .swing-fig canvas{height:270px;} }
+
+/* labels for the two halves of a side-by-side video, in the page's own type */
+.vid-keys{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:.55rem;}
+.vkey{font-size:.82rem;color:var(--ink-2);text-align:center;}
+.vkey b{color:var(--ink);font-weight:600;}
+
+/* the two-policy clip is 1600x290: let it keep its own aspect instead of being
+   letterboxed into 16/9, which was padding it with black above and below */
+.vid.strip video{aspect-ratio:1600/290; object-fit:cover; background:transparent;}
+
+/* headline and lede that should not wrap into a stack */
+.body.one-line{max-width:78ch;}
+
+/* headline sitting directly on its lede */
+h2.tight-lede{margin-bottom:.24em;}
+/* the closing walk: same treatment, running the other way down the page */
+.walk-down canvas{height:420px;}
+@media (max-width:820px){ .walk-down canvas{height:300px;} }
+
+/* ── two-policies section: give each block room to be its own thing ────────
+   Video labels, chart caption and the closing paragraph were stacking with
+   near-identical gaps, so the section read as one undifferentiated column. */
+.vid-keys{margin-top:.85rem;}
+.vkey{font-size:.78rem;letter-spacing:.01em;line-height:1.5;}
+.vid.strip{margin-bottom:2.6rem;}
+
+.swing-fig{margin:0 0 2.2rem;}
+.swing-fig figcaption{margin-top:1.1rem;max-width:62ch;}
+
+/* the closing line is the point of the section, so let it sit clear of the chart */
+.swing-note{margin:0;max-width:56ch;font-size:1.02rem;line-height:1.62;}
+.swing-note b{font-weight:600;}
+
+/* more air between the blocks of the two-policies section */
+.vid.strip{margin-bottom:3.4rem;}
+.swing-note{margin:0 0 2.6rem;}
+.swing-fig{margin:0 0 3.2rem;}
+.swing-fig figcaption{margin-top:1.4rem;max-width:48ch;}
+.walk-down{margin-top:1.2rem;}
+
+/* this caption belongs to the chart above it, so centre it under the plot rather than
+   letting it hang off the left edge like a body paragraph */
+.swing-fig figcaption{justify-content:center;text-align:center;margin-left:auto;margin-right:auto;}
+
+/* more air again: this section carries four distinct beats (claim, footage, finding,
+   evidence) and they should not read as one continuous column */
+.vid.strip{margin-bottom:5rem;}
+.vid-keys{margin-top:1.15rem;}
+.swing-note{margin:0 0 4rem;}
+.swing-fig{margin:0 0 5rem;}
+.swing-fig figcaption{margin-top:2rem;}
+.walk-down{margin-top:2rem;}
+h2.tight-lede{margin-bottom:.3em;}
+
+/* one line: the cap was forcing a two-line wrap under a full-width chart */
+.swing-fig figcaption{max-width:none;white-space:nowrap;}
+@media (max-width:700px){ .swing-fig figcaption{white-space:normal;} }
+
+/* the lede was sitting almost on top of the footage */
+.band .body + .vid.strip{margin-top:3.2rem;}
+
+/* the lede and the footage are two separate beats: give them real distance */
+.band .body + .vid.strip{margin-top:6.5rem;}
+
+/* a full beat of silence between the claim and the footage that answers it */
+.band .body + .vid.strip{margin-top:11rem;}
+
+/* a way through to the film version, sitting quietly at the end of the scroll */
+.film-link{
+  display:inline-flex; align-items:baseline; gap:.7rem; flex-wrap:wrap;
+  margin-top:2.4rem; text-decoration:none; color:var(--ink);
+  font-size:1.05rem; font-weight:500; letter-spacing:-.01em;
+}
+.film-link small{color:var(--ink-3); font-weight:400; font-size:.78rem;}
+.film-link-play{
+  width:0; height:0; align-self:center;
+  border-left:9px solid var(--ink); border-top:6px solid transparent;
+  border-bottom:6px solid transparent; transition:transform .18s ease;
+}
+.film-link:hover .film-link-play{transform:translateX(3px)}
+.film-link:hover span:not(.film-link-play){text-decoration:underline; text-underline-offset:3px}

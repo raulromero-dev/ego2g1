@@ -18,10 +18,13 @@ assets/smpl/**
 *.safetensors
 *.onnx
 
-# media
+# media. The rules below exist for raw captures and renders, which are large and
+# reproducible. The showcase site is neither: its videos ARE the deliverable, so they
+# are exempted rather than the rule being loosened everywhere.
 *.mp4
 *.mov
 *.MOV
+!site/public/video/*.mp4
 *.r3d
 *.usdz
 *.hdf5
@@ -58,3 +61,6 @@ egocentric-data/
 
 # downloaded general corpus (147 min of LAFAN1 retargeted to G1)
 data/35_reference/general/
+
+# the original of the site's dad-and-me.jpg; the cropped one in site/ is the published copy
+papa_y_yo.jpeg

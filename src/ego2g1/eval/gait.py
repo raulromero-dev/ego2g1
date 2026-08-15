@@ -211,3 +211,118 @@ def compare(a: GaitSignature, b: GaitSignature, *, timing_only: bool = True) -> 
         out[k] = {"a": va, "b": vb, "abs_diff": va - vb,
                   "pct_diff": 100.0 * (va - vb) / vb if abs(vb) > 1e-9 else float("nan")}
     return out
+
+
+def step_width_series(body_pos_w: np.ndarray, fps: float, left: int, right: int
+                      ) -> tuple[np.ndarray, np.ndarray]:
+    """Per-step width, by the gait-lab definition. Returns (widths_m, time_s).
+
+    An earlier version of this fitted one straight line to the whole episode and measured
+    lateral offset against it. That silently produced garbage on this dataset: the passes are
+    out-and-back, so net displacement is ~0.5 m over a ~20 m path and the fitted heading is
+    noise. Anything measured against it is noise too.
+
+    The standard definition (Huxham et al. 2006) never needs a global heading. For each foot
+    contact, take the two *contralateral* contacts bracketing it in time; the line between them
+    is the local line of progression, and the step width is this foot's perpendicular distance
+    from it. Purely local, so turning, curved paths and out-and-back passes are all fine.
+
+    Scale-free in practice: both sides are measured by forward kinematics on the same G1 body,
+    so the quantity depends on joint angles, not on the camera focal length or on subject size.
+    """
+    def contacts(idx: int) -> list[tuple[float, np.ndarray]]:
+        mask = detect_contact(body_pos_w[:, idx], fps)
+        out = []
+        for a, b in _runs(mask, fps):
+            mid = (a + b) // 2
+            out.append((mid / fps, body_pos_w[a:b, idx, :2].mean(axis=0)))
+        return out
+
+    lc, rc = contacts(left), contacts(right)
+    widths, times = [], []
+    for this, other in ((lc, rc), (rc, lc)):
+        for t, p in this:
+            before = [c for c in other if c[0] < t]
+            after = [c for c in other if c[0] > t]
+            if not before or not after:
+                continue                       # no bracketing pair -> no line of progression
+            p0, p1 = before[-1][1], after[0][1]
+            seg = p1 - p0
+            n = np.linalg.norm(seg)
+            if n < 0.05:                       # contralateral foot barely moved; ill-conditioned
+                continue
+            # perpendicular distance from p to the infinite line through p0,p1.
+            # 2-D cross written out: numpy 2 removed the 2-vector form of np.cross.
+            d = p - p0
+            widths.append(abs(seg[0] * d[1] - seg[1] * d[0]) / n)
+            times.append(t)
+
+    order = np.argsort(times)
+    return np.asarray(widths)[order], np.asarray(times)[order]
+
+
+def foot_progression_series(body_pos_w: np.ndarray, body_quat_w: np.ndarray, fps: float,
+                            left: int, right: int) -> np.ndarray:
+    """Per-step foot progression angle in degrees: how far the foot points off the direction
+    of travel. Positive = toe-out ("duck-footed"); ~0 = foot aligned with travel.
+
+    Uses the same local line of progression as :func:`step_width_series`, for the same reason:
+    a heading fitted to a whole episode is meaningless when the walk is out-and-back. The
+    foot's own axis is the body frame's +x, taken from MuJoCo's ``xquat`` at mid-stance.
+    """
+    def rot_x(q: np.ndarray) -> np.ndarray:
+        w, x, y, z = q
+        return np.array([1 - 2 * (y * y + z * z), 2 * (x * y + w * z)])  # world x,y of body +x
+
+    def contacts(idx):
+        mask = detect_contact(body_pos_w[:, idx], fps)
+        out = []
+        for a, b in _runs(mask, fps):
+            mid = (a + b) // 2
+            out.append((mid / fps, body_pos_w[a:b, idx, :2].mean(axis=0), rot_x(body_quat_w[mid, idx])))
+        return out
+
+    lc, rc = contacts(left), contacts(right)
+    angles = []
+    for this, other in ((lc, rc), (rc, lc)):
+        for t, _p, axis in this:
+            before = [c for c in other if c[0] < t]
+            after = [c for c in other if c[0] > t]
+            if not before or not after:
+                continue
+            seg = after[0][1] - before[-1][1]
+            if np.linalg.norm(seg) < 0.05:
+                continue
+            travel = np.arctan2(seg[1], seg[0])
+            foot = np.arctan2(axis[1], axis[0])
+            angles.append(abs(np.degrees((foot - travel + np.pi) % (2 * np.pi) - np.pi)))
+    return np.asarray(angles)
+
+
+def step_width_facing(joints: np.ndarray, fps: float, left: int, right: int,
+                      l_hip: int, r_hip: int) -> np.ndarray:
+    """Step width measured against the pelvis's facing direction, not against foot travel.
+
+    :func:`step_width_series` needs the contralateral foot to have moved between contacts to
+    define a line of progression. On a treadmill it has not -- successive contacts land in the
+    same place -- so that estimator returns nothing at all on datasets like BMLrub.
+
+    Here the sagittal plane is defined by the hip-to-hip axis, and step width is the separation
+    of the two feet along that axis at the moment both are loaded. This is the definition
+    treadmill gait labs use, and it is valid overground too, which is what lets one estimator
+    run on both sides of a comparison.
+    """
+    lc = detect_contact(joints[:, left], fps)
+    rc = detect_contact(joints[:, right], fps)
+    both = lc & rc                                   # double support: both feet down
+    out = []
+    for a, b in _runs(both, fps):
+        m = (a + b) // 2
+        across = joints[m, r_hip, :2] - joints[m, l_hip, :2]
+        n = np.linalg.norm(across)
+        if n < 1e-6:
+            continue
+        across = across / n
+        sep = joints[m, left, :2] - joints[m, right, :2]
+        out.append(abs(float(sep @ across)))         # component along the hip axis
+    return np.asarray(out)

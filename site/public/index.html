@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>my walk of life</title>
+<meta name="description" content="Everyone tells me I walk in a particular way. So I recorded myself, put it on a robot, and measured it.">
+<!-- the tab icon is the same sole every chart on the page is stamped with -->
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Architects+Daughter&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css?v=1786723970">
+</head>
+<body data-palette="#7E9338,#2E6FB7">
+
+<button class="mode" id="mode" aria-label="Toggle dark mode" aria-pressed="false">
+  <!-- drawn with a marker: wobbly strokes, uneven rays, nothing geometric -->
+  <svg class="ic moon" viewBox="0 0 26 26" aria-hidden="true">
+    <path d="M21.2 15.9c-1.3.7-2.8 1-4.4.8-4.7-.5-8.2-4.6-7.8-9.3.1-1.4.6-2.7 1.3-3.8C6 4.9 3.2 8.6 3.6 12.9c.4 5.1 4.9 8.9 10 8.5 3.5-.3 6.4-2.5 7.6-5.5z"/>
+  </svg>
+  <svg class="ic sun" viewBox="0 0 26 26" aria-hidden="true">
+    <path d="M13 8.3c2.7-.1 4.9 2 4.8 4.7-.1 2.6-2.2 4.7-4.8 4.7-2.7.1-4.8-2.1-4.7-4.8.1-2.5 2.2-4.6 4.7-4.6z"/>
+    <path d="M13 1.9v3.1M13.1 21v3M4.6 4.4l2.2 2.3M19.4 19.2l2.1 2.2M1.8 13h3.1M21.1 12.9h3.1M4.3 21.4l2.3-2.2M19.3 6.7l2.2-2.3"/>
+  </svg>
+</button>
+
+<!-- ─────────────────────────────  1. HERO  ───────────────────────────── -->
+<header class="hero">
+  <h1 class="reveal">my walk<br><em>of life</em></h1>
+  <blockquote class="reveal" style="--d:220ms">
+    Everyone tells me that I walk in a particular way<span class="dots">...</span>
+    just like my dad did.
+  </blockquote>
+  <div class="scroll-cue" aria-hidden="true"><span></span></div>
+</header>
+
+<!-- ───────────────────────  1b. THE PHOTO, STAGED  ─────────────────── -->
+<section class="portrait-moment">
+  <figure class="pin tall portrait-stage">
+    <img src="/img/dad-and-me.jpg" alt="Me as a small boy, sitting beside my dad" loading="lazy">
+    <svg class="arrow" viewBox="0 0 200 150" aria-hidden="true">
+      <path class="arrow-path" d="M6,22 C62,10 118,36 150,86" />
+      <path class="arrow-head" d="M128,82 L152,92 L143,64" />
+    </svg>
+    <span class="sharpie note-a">him and me</span>
+  </figure>
+</section>
+
+<!-- ─────────────────────────  2. THE SHOES  ──────────────────────── -->
+<section class="band">
+  <h2 class="reveal">My shoes do get a weird shape after a while</h2>
+
+  <!-- the marker is drawn straight across the photo, frame be damned -->
+  <figure class="pin shoe-solo reveal">
+    <div class="shoe-plate">
+      <img src="/img/shoe2.png" alt="The same sneaker from above, its heel collar splayed open and wide" loading="lazy">
+      <svg class="scrawl-arrow" viewBox="0 0 160 120" aria-hidden="true">
+        <!-- it stops on the pale rim of the collar; ink on ink would vanish -->
+        <path class="arrow-path" d="M150,6 C142,40 122,76 92,94" />
+        <path class="arrow-head" d="M112,92 L87,98 L100,76" />
+      </svg>
+      <span class="sharpie scrawl-heel">the heel section opens up<br>and widens the shoe</span>
+    </div>
+  </figure>
+</section>
+
+<!-- ─────────────────────────  3. THE RIG  ─────────────────────────── -->
+<section class="band">
+  <h2 class="reveal">So I decided to check if it's true that I walk differently</h2>
+  <figure class="pin rig-solo">
+    <img src="/img/hat-rig.jpg" alt="The hat with a phone mounted under the brim" loading="lazy">
+    <svg class="arrow" viewBox="0 0 200 150" aria-hidden="true">
+      <path class="arrow-path" d="M6,22 C62,10 118,36 150,86" />
+      <path class="arrow-head" d="M128,82 L152,92 L143,64" />
+    </svg>
+    <span class="sharpie note-b">the rig</span>
+  </figure>
+</section>
+
+<!-- ──────────────────  3b. WHAT THE COMPARISON SAID  ─────────────────── -->
+<section class="band">
+  <h2 class="two-line reveal">I compared half an hour of recordings walking at SEAS to 100s of open source human demos.</h2>
+  <p class="body reveal">
+    Time was short, so my steps had 39% less variance than the open source dataset I used.
+  </p>
+
+  <div class="duo-charts">
+    <figure class="chart units reveal">
+      <canvas id="episodes"></canvas>
+      <figcaption>
+        <!-- one flex item, or the caption breaks around the link -->
+        <span>one print = one episode · 60 mine, 183
+        <a class="cite" href="https://github.com/ubisoft/ubisoft-laforge-animation-dataset"
+           target="_blank" rel="noopener">LAFAN1 ↗</a></span>
+      </figcaption>
+    </figure>
+
+    <figure class="chart reveal" style="--d:120ms">
+      <canvas id="swarm"></canvas>
+      <figcaption>
+        <span class="key">
+          <svg class="sole" viewBox="0 0 42 100" aria-hidden="true">
+            <path class="k-mine" d="M21,0 C38.2,1 41.8,7.5 41.4,24 C41,42.5 39.5,64 37.8,83 C36.5,97.5 29.8,100 21,100 C12.2,100 5.9,97.5 5,83 C4.2,67 12.2,61 11.6,47.5 C10.9,34 2.1,29 1.1,20 C0,9 4.2,1 21,0 Z"/>
+          </svg> me</span>
+        <span class="key">
+          <svg class="sole" viewBox="0 0 42 100" aria-hidden="true">
+            <path class="k-them" d="M21,0 C38.2,1 41.8,7.5 41.4,24 C41,42.5 39.5,64 37.8,83 C36.5,97.5 29.8,100 21,100 C12.2,100 5.9,97.5 5,83 C4.2,67 12.2,61 11.6,47.5 C10.9,34 2.1,29 1.1,20 C0,9 4.2,1 21,0 Z"/>
+          </svg> mocap actors</span>
+        · step-to-step variability, one print per episode
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ─────────────────────────────  4. VERDICT  ────────────────────────── -->
+<section class="verdict">
+  <h2 class="huge reveal">Turns out<br>it's <em>true</em></h2>
+</section>
+
+<!-- ──────────────────  4b. HEELS IN, TOES OUT  ────────────────────── -->
+<section class="band tight-top">
+  <!-- the title keeps to the left column; the walk crosses the space beside it -->
+  <div class="heels-top">
+    <h2 class="reveal">My heels walk a tightrope.<br>My toes don't.</h2>
+    <figure class="walk-fig">
+      <canvas id="walkPrints"></canvas>
+    </figure>
+  </div>
+
+  <!-- one statement over both halves: me walking on the left, my feet on the right -->
+  <p class="lead reveal">I was sure I planted my feet wide. At the ankle I'm the opposite.</p>
+
+  <div class="walk-and-feet reveal">
+    <!-- my recovered body, drawn from its own geometry rather than played as a video -->
+    <figure class="mesh-fig">
+      <canvas id="meshWalk"></canvas>
+      <figcaption>SMPL-X body GVHMR fitted to my footage, one gait cycle</figcaption>
+    </figure>
+
+    <figure class="foot-fig">
+      <canvas id="footCompare"></canvas>
+      <figcaption>where I plant them, against where they are expected. both pairs to scale from the measured medians</figcaption>
+    </figure>
+  </div>
+
+  <figure class="chart reveal">
+    <canvas id="widthDist"></canvas>
+    <figcaption>
+      <span class="key"><i style="background:var(--ink)"></i> my steps, 684</span>
+      <span class="key"><i style="background:var(--ink-3)"></i> mocap actors, 1,384</span>
+      · how far apart my feet landed on every step, against theirs. each shape is scaled to its own tallest bar so the two can be compared
+    </figcaption>
+  </figure>
+
+  <!-- the claim and the footage that backs it sit side by side, not stacked -->
+  <div class="pitch reveal">
+    <div class="pitch-text">
+      <h2 class="two-line">So I turned my walk into robot training data.</h2>
+    </div>
+
+    <figure class="vid pair">
+      <video src="/video/mesh-to-robot.mp4" autoplay loop muted playsinline></video>
+      <figcaption>left, the body model fitted to my footage. right, one of my passes retargeted onto the G1, which is the training data itself</figcaption>
+    </figure>
+  </div>
+
+</section>
+
+<!-- ────────────────────────  8. TWO POLICIES  ────────────────────────── -->
+<section class="band">
+  <h2 class="reveal two-line tight-lede">Then I trained two robots</h2>
+  <p class="body reveal">One learned from my 93 walks. The other learned from actors.</p>
+
+  <figure class="vid wide strip reveal">
+    <video src="/video/two-policies.mp4" autoplay loop muted playsinline controls></video>
+    <div class="vid-keys">
+      <span class="vkey">trained on <b>my</b> walk</span>
+      <span class="vkey">trained on mocap actors</span>
+    </div>
+  </figure>
+
+  <p class="body swing-note reveal">
+    Neither one plants its feet like me. But one of them keeps my time.
+  </p>
+
+  <figure class="swing-fig reveal">
+    <canvas id="swing"></canvas>
+    <figcaption>how long each foot spends off the ground, per step. measured over ~450 steps per robot</figcaption>
+  </figure>
+
+
+  <figure class="walk-fig walk-down reveal">
+    <canvas id="walkPrintsB"></canvas>
+  </figure>
+</section>
+
+<footer>
+  <div class="rule"></div>
+</footer>
+
+<script src="/app.js?v=1786723970"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- the same sole the charts are stamped with: a left and a right, staggered
+       half a stride apart. Two marks fill the square better than one long foot,
+       and still read as footprints down at 16px. -->
+  <style>
+    path { fill: #000 }
+    @media (prefers-color-scheme: dark) { path { fill: #fff } }
+  </style>
+  <defs>
+    <path id="sole" d="M21,0 C38.2,1 41.8,7.5 41.4,24 C41,42.5 39.5,64 37.8,83 C36.5,97.5 29.8,100 21,100 C12.2,100 5.9,97.5 5,83 C4.2,67 12.2,61 11.6,47.5 C10.9,34 2.1,29 1.1,20 C0,9 4.2,1 21,0 Z"/>
+  </defs>
+  <use href="#sole" transform="translate(42,21) rotate(9) scale(.42) translate(-21,-50)"/>
+  <use href="#sole" transform="translate(22,43) rotate(9) scale(-.42,.42) translate(-21,-50)"/>
+</svg>

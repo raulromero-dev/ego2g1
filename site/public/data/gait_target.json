@@ -1,0 +1,40 @@
+{
+ "cadence_hz": {
+  "median": 1.8461538461538463,
+  "p25": 1.7343452002542912,
+  "p75": 1.9672131147540985,
+  "n": 60
+ },
+ "step_time_mean_s": {
+  "median": 0.5416666666666666,
+  "p25": 0.5083333333333333,
+  "p75": 0.5765873015873015,
+  "n": 60
+ },
+ "arm_swing_amp_rad": {
+  "median": 0.25866395235061646,
+  "p25": 0.20891021192073822,
+  "p75": 0.31780025362968445,
+  "n": 60
+ },
+ "arm_leg_phase_rad": {
+  "median": -2.894714593887329,
+  "p25": -3.025250554084778,
+  "p75": 2.673747718334198,
+  "n": 60
+ },
+ "torso_pitch_mean_rad": {
+  "median": 0.11427406594157219,
+  "p25": 0.09020214155316353,
+  "p75": 0.14041916653513908,
+  "n": 60
+ },
+ "torso_pitch_std_rad": {
+  "median": 0.03165457025170326,
+  "p25": 0.02927521988749504,
+  "p75": 0.037672399543225765,
+  "n": 60
+ },
+ "_note": "Trusted subset only. duty_factor/double_support/symmetry omitted: they need stance DURATION, which requires sole geometry rather than the ankle joint.",
+ "_n_spans": 60
+}
